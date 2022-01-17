@@ -9,6 +9,7 @@ import Feature from 'ol/Feature';
 
 // components
 import MapElement from './components/MapWrapper'
+import Take_Arg from './components/Take_Arg'
 
 function App() {
   
@@ -26,7 +27,7 @@ function App() {
         <p>Web Map with React and OpenLayers</p>
         <p>Press button to move </p>
       </div>
-      
+      <Take_Arg scope={features} func={setFeatures}/>
       <MapElement features={features} />
 
     </div>

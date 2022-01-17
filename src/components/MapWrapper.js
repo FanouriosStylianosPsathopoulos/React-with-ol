@@ -21,6 +21,14 @@ function MapElement(props) {
   const mapElement_1 = useRef()
   
 
+  var button_1_name,button_2_name;
+
+  
+
+  if (props.features.length!=0){
+    button_1_name=props.features[0]["button"];
+    button_2_name=props.features[1]["button"];
+  }
 
   // initialize map on first render - logic formerly put into componentDidMount
   useEffect( () => {
@@ -28,28 +36,56 @@ function MapElement(props) {
     class GoHome extends Control {
  
       constructor(opt_options) {
+        console.log(opt_options)
         const options = opt_options || {};
+        
 
         const button = document.createElement('button');
-        button.innerHTML = 'H';
+        
 
         const element = document.createElement('div');
-        element.className = 'rotate-north ol-unselectable ol-control';
+        if (options=="M_H")
+        {
+          button.innerHTML = "M_H";
+          element.className="M_H";
+        }
+        else
+        {
+          button.innerHTML = "S_H";
+          element.className="S_H";
+        }
+        
         element.appendChild(button);
 
+        
         super({
           element: element,
           target: options.target,
         });
 
-        button.addEventListener('click', this.GoHome.bind(this), false);
-      }
+        if (options=="M_H")
+        {
+          
+          button.addEventListener('click', this.GoHome.bind(this), false);
+        }
+        else
+        { 
+            
+            button.addEventListener('click', this.GoSecondHome.bind(this), false);
+        }      
+        }
       
       GoHome() {
         this.getMap().getView().setCenter([2634988.7369055296, 4585178.285664959]);
         this.getMap().getView().setZoom(17);
       }
+
+      GoSecondHome() {
+        this.getMap().getView().setCenter([28999.7369055296, 4585178.285664959]);
+        this.getMap().getView().setZoom(17);
+      }
     }
+
 
     // create and add vector source layer
     const initalFeaturesLayer = new VectorLayer({
@@ -58,7 +94,7 @@ function MapElement(props) {
 
     // create map
     const map = new Map({
-      controls: defaultControls().extend([new GoHome()]),
+      controls: defaultControls().extend([new GoHome(button_1_name),new GoHome(button_2_name),new GoHome(button_1_name)]),
       layers: [
         new TileLayer({
           source: new OSM(),
@@ -74,7 +110,7 @@ function MapElement(props) {
 
   
 
-  },[])
+  },[props.features])
 
   // update map if features prop changes - logic formerly put into componentDidUpdate
 
