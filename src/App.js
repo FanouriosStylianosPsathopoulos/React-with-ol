@@ -8,7 +8,9 @@ import GeoJSON from 'ol/format/GeoJSON'
 import Feature from 'ol/Feature';
 
 // components
+import Take_Arg from './components/Take_Arg'
 import MapElement from './components/MapWrapper'
+
 
 function App() {
   
@@ -26,8 +28,9 @@ function App() {
         <p>Web Map with React and OpenLayers</p>
         <p>Press button to move </p>
       </div>
+      <Take_Arg scope={features} func={setFeatures}/>
       
-      <MapElement features={features} />
+      <MapElement other={features} />
 
     </div>
   )
