@@ -10,7 +10,7 @@ import Draw from 'ol/interaction/Draw'
 import XYZ from 'ol/source/XYZ'
 import {transform} from 'ol/proj'
 import {OSM, Vector as VectorSource} from 'ol/source';
-
+import axios from 'axios';
 
 import {Control, defaults as defaultControls} from 'ol/control';
 
@@ -55,18 +55,118 @@ import {toStringXY} from 'ol/coordinate';
 }
 
 } */
+class Alert extends Component{
+  constructor(props){
+    
+    super(props)
+    
+  }
+
+  hit_alert(){
+    window.alert("Your coordinates were successfully ");
+    this.setState({
+
+            response_id: 0
+       });
+    console.log(this.props.props_pass)
+  }
+
+  componentDidMount() {
+    this.hit_alert()
+  }
+
+  componentDidUpdate(prevProps){
+    console.log("poses",prevProps.props_pass,this.props.props_pass)
+    if (prevProps.props_pass!=this.props.props_pass){
+      this.hit_alert()
+    }
+    
+    //this.send_lang_lat();
+  }
+
+
+   render(){
+    return (      
+      <div className="subclass_1">
+    
+      </div>
+    );
+}
+
+}
+//sth
+class Post_Method extends Component{
+  constructor(props){
+    super(props)
+    this.state={response_id: 0}
+    this.var=0;
+    
+  }
+
+  send_lang_lat(){
+    const coords = this.props.prop_array;
+    const baseURL="https://jsonplaceholder.typicode.com/posts";
+    axios
+      .post(baseURL, coords)
+      .then((response) => {
+        this.var=response.status
+        if (this.state.response_id==response.status) {
+
+        this.setState({
+
+            response_id: response.status + 1
+       });
+      }
+      else{
+        this.setState({
+
+            response_id: response.status
+       });
+      }
+      });
+    
+  }
+
+  componentDidMount() {
+    
+    this.send_lang_lat();
+  }
+
+  componentDidUpdate(prevProps){
+  
+
+    if (prevProps.prop_array!=this.props.prop_array)
+    {
+        this.send_lang_lat();
+    }
+    //this.send_lang_lat();
+  }
+  
+  render(){
+    return (      
+      <div className="subclass_1">
+      {(this.state.response_id!=0) ? <Alert props_pass={this.state.response_id}/> : null }
+
+      </div>
+    );
+}
+}
 
 
 function MapElement(props) {
 
   // pull refs
+  
   const mapElement_1 = useRef()
   
   const type_element_1= useRef()
 
   var button_1_name,button_2_name,long_1,long_2,lat_1,lat_2;
 
-  
+  const [array_with_cords, set_cords] = useState([]);
+
+  const [boolean_value,set_bool]=useState(5==6);
+  const typical_array=new Array();
 
   if (props.other.length!=0){
     button_1_name=props.other[0]["button"];
@@ -174,13 +274,37 @@ function MapElement(props) {
         });
         map.addInteraction(draw);
     }
+    draw.on('drawend', function(evt) { 
+      //console.log("sth",evt.feature.getGeometry().getCoordinates());
+      var array_temp=evt.feature.getGeometry().getCoordinates();
+      set_cords(array_temp);
+      set_bool(5==5)
+      console.log(array_with_cords,array_temp)
+      //console.log(boolean_value);
+    });
   }
+
+
     function add(event)
     {
-      
-      console.log(event.coordinate)
+      if (typical_array.length==0) {
+        typical_array.push(event.coordinate);
+      }
+      else if (typical_array.includes(event.coordinate)){
+        set_cords(typical_array);
+        typical_array=[]
+
+      }
+      else{
+        typical_array.push(event.coordinate);
+      }
+
+      //console.log(event.coordinate)
+      //console.log("The array is",typical_array)
       
     }
+
+    
     map.addEventListener("click",add)
 
   addInteraction();
@@ -199,6 +323,8 @@ function MapElement(props) {
         <option value="None">None</option>
       </select>
     </form>
+
+    {boolean_value ? <Post_Method prop_array={array_with_cords}/> : null}
     </div>
   ) 
 
