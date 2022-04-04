@@ -3,6 +3,10 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "@arcgis/core": "^4.22.2",
+    "@esri/arcgis-rest-auth": "^3.4.3",
+    "@esri/arcgis-rest-geocoding": "^3.4.3",
+    "@esri/arcgis-rest-request": "^3.4.3",
     "@testing-library/jest-dom": "^5.16.2",
     "@testing-library/react": "^12.1.2",
     "@testing-library/user-event": "^13.5.0",
