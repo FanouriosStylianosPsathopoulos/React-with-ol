@@ -5,6 +5,9 @@ import { geocode } from '@esri/arcgis-rest-geocoding';
 import React, { useState, useEffect, useRef , Component} from 'react';
 //css
 import './Map.css';
+
+//json
+import {return_json} from './Create_json.js'
 // openlayers
 import Map from 'ol/Map';
 import View from 'ol/View';
@@ -227,12 +230,16 @@ class Render_Map extends React.Component{
       });
 
         //give console input
-        var msg_string;
+        var msg_string,json='',coords;
         if (feature==null){
           msg_string="This is not a legit point of interest to give you info about"
         }
         else {
+          coords=transform(feature.getGeometry().getCoordinates(), 'EPSG:3857','EPSG:4326') 
           var msg_string="The coords of the feature are: " + transform(feature.getGeometry().getCoordinates(), 'EPSG:3857','EPSG:4326')
+          
+          json=return_json("Info_Point",coords)
+          console.log("Info point is ",JSON.stringify(json, null, 2))
         }
 
         inside_this.props.input_handle(msg_string)
@@ -246,10 +253,17 @@ class Render_Map extends React.Component{
   Polygon_Behaviour(evt){
     //get the coords
     var array_temp=evt.feature.getGeometry().getCoordinates();
+    //make json to send to back-end
+    var json=return_json("Polygon_json",array_temp)
+
+    console.log("Json is: ",JSON.stringify(json, null, 2));
     //send them to back-end and get Interesting Points
     //Send_Coords
     
+
     this.Draw_Points(array_temp[0][0])
+
+    
 
   }
 
