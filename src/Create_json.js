@@ -17,7 +17,7 @@ function return_json(desc,obj_){
         }}
     }
 
-    return json
+    return json[0]
 }
 
 export {return_json} ; 
