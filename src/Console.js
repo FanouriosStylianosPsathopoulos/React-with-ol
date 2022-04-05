@@ -64,6 +64,15 @@ class Console extends React.Component{
             </div>
         }
         else if (this.props.feature[0]=="Address") {
+            if (this.props.input=="You have to pick an option to be able to submit the point of interest."){
+                button=<div style={mystyle} >
+                <h3> Console </h3>
+                    
+                <p>You have to pick an option to be able to submit the point of interest.</p>
+            
+                </div>
+            }
+            else {
             button=
             <div style={mystyle} >
             <h3> Console </h3>
@@ -73,6 +82,7 @@ class Console extends React.Component{
             <button onClick={this.no_func}>No</button>
         
             </div>
+            }
         }
     }
     else {

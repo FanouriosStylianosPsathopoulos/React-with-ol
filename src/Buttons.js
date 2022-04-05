@@ -144,7 +144,7 @@ class Buttons extends React.Component{
     
     <div>
         {render_sub_buttons}
-        <Form input={this.state.poi_option} coords={this.props.coords} change_map_func={this.props.func_handle} address_change={this.props.change_address} poi_value={this.props.poi_val}/>
+        <Form input={this.state.poi_option} coords={this.props.coords} input_handle={this.props.input_handle}  change_map_func={this.props.func_handle} address_change={this.props.change_address} poi_value={this.props.poi_val}/>
     </div>
     </div> 
     

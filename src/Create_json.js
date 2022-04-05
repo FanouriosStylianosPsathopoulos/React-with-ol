@@ -9,6 +9,7 @@ function return_json(desc,obj_){
         
            return {polygon : z}
         })
+        json=json[0]
     }
     else if (desc=="Info_Point"){
         json= {point : {
@@ -16,8 +17,16 @@ function return_json(desc,obj_){
             latitude : obj_[1]
         }}
     }
+    else if (desc="Point of interest"){
+        json= {point : {
+            longitude : obj_[0][0],
+            latitude : obj_[0][1]
+            },
+            type_of_place : obj_[1]
+            }
+    }
 
-    return json[0]
+    return json
 }
 
 export {return_json} ; 

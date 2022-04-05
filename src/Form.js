@@ -2,6 +2,9 @@
 import { preventDefault } from 'ol/events/Event';
 import React, { useState, useEffect, useRef , Component} from 'react';
 
+//json
+import {return_json} from './Create_json.js'
+
 class Form extends React.Component{
     constructor(props){
       super(props)
@@ -11,7 +14,8 @@ class Form extends React.Component{
         changing_input:"",
         address: "",
         console_log: false,
-        select_value:""
+        select_value:"",
+        submit_button : false
       }
 
       this.ChangeInput=this.ChangeInput.bind(this)
@@ -24,16 +28,33 @@ class Form extends React.Component{
         event.preventDefault()
         console.log(this.props.coords,this.state.select_value)
         if (this.state.select_value==''){
-            
+            this.props.input_handle("You have to pick an option to be able to submit the point of interest.")
+            this.setState({submit_button:true })
+        }
+        else {
+            //we have both coord of the point and what type it is 
+
+            //make them json so u can send them to back end 
+            var comb_of_data=[this.props.coords,this.state.select_value]
+            var json=return_json("Point of interest",comb_of_data)
+
+            console.log("Point of interest ",JSON.stringify(json, null, 2));
+
+            //api stuff 
+
+            //change everything to default buttons 
         }
 
     }
     ChangeInput(event){
         this.setState({changing_input:event.target.value})
+        
     }
 
     Handle_Change(event){
         this.setState({select_value: event.target.value});
+        this.props.input_handle("")
+        this.setState({submit_button:false })
     }
     Handling(event){
         
@@ -45,7 +66,8 @@ class Form extends React.Component{
 
 
     render(){
-        var button_to_render;
+
+        var button_to_render,submit_alert='';
         console.log(this.props.input)
         if (this.props.input=="draw"){
             button_to_render=""
@@ -59,6 +81,9 @@ class Form extends React.Component{
             </div>
             }
             else {
+                if (this.state.submit_button){
+                    submit_alert=<span style={{color: 'red'}}> Pick a type of point of interest </span>
+                }
                 button_to_render=<div>
                 <form>
                 <label>Choose the type of point of interest </label>
@@ -68,7 +93,8 @@ class Form extends React.Component{
                     <option value="Hospital">Hospital</option>
                     <option value="Market">Market</option>
                     </select>
-                    <button onClick={this.Submit_Poi}>Submit</button>
+                    <button onClick={this.Submit_Poi} >Submit</button>
+                    {submit_alert}
                 </form>
                 </div>
             }

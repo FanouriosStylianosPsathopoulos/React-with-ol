@@ -84,7 +84,7 @@ class App extends React.Component {
     return(
       <div className="App">
       <Render_Map map={this.state.map_n} rejection_handle={this.Rejection_Point} coord_change={this.Change_Poi_Cord} feature_change={this.Change_Features} func_handle={this.Change_Map} map_features={this.state.map_functionality} input_handle={this.Change_Input} address={this.state.address} />
-      <Buttons map={this.state.map_n} coords={this.state.coords_of_poi} rejection_handle={this.Rejection_Point} reject={this.state.point_rejected} func_handle={this.Change_Features} change_address={this.Change_Address} poi_val={this.state.poi_form} />
+      <Buttons map={this.state.map_n} coords={this.state.coords_of_poi} rejection_handle={this.Rejection_Point} reject={this.state.point_rejected} func_handle={this.Change_Features} change_address={this.Change_Address} poi_val={this.state.poi_form} input_handle={this.Change_Input} />
       <Console input={this.state.input_message} func_handle={this.Change_Features} feature={this.state.map_functionality} change_poi_bool={this.Change_Poi_Form} input_handle={this.Change_Input} />
      </div>
     )
