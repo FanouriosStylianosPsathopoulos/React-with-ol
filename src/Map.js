@@ -8,6 +8,9 @@ import './Map.css';
 
 //json
 import {return_json} from './Create_json.js'
+//swagger openapi
+import {ApartmentControllerApi} from './generated_sources/openapi/apis/';
+
 // openlayers
 import Map from 'ol/Map';
 import View from 'ol/View';
@@ -240,6 +243,10 @@ class Render_Map extends React.Component{
           
           json=return_json("Info_Point",coords)
           console.log("Info point is ",JSON.stringify(json, null, 2))
+
+          //send the coords 
+
+
         }
 
         inside_this.props.input_handle(msg_string)
