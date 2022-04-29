@@ -7,9 +7,9 @@ import React, { useState, useEffect, useRef , Component} from 'react';
 import './Map.css';
 
 //json
-import {return_json} from './Create_json.js'
+import {return_json} from './Create_json'
 //swagger openapi
-import {ApartmentControllerApi} from './generated_sources/openapi/apis/ApartmentControllerApi.ts';
+//import {Configuration} from './generated_sources/openapi/runtime'
 
 // openlayers
 import Map from 'ol/Map';
@@ -245,6 +245,14 @@ class Render_Map extends React.Component{
           console.log("Info point is ",JSON.stringify(json, null, 2))
 
           //send the coords 
+
+          //const configuration = new Configuration({
+            //basePath: window.location.origin,
+          //});
+          
+          //const generalpointcontrollerapi = new GeneralPointControllerApi();
+
+          //generalpointcontrollerapi.getPointInfo() 
 
 
         }

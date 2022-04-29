@@ -2,7 +2,7 @@ import logo from './logo.svg';
 import './App.css';
 import './Map.css';
 import styles from  './mystyle.module.css';
-import Render_Map from './Map.js';
+import Render_Map from './Map.tsx';
 import {Make_Form,Pass_Address} from './Form.js';
 import Form from './Form.js';
 import Buttons from './Buttons.js';
