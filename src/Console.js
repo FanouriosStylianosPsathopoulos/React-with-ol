@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef , Component} from 'react';
+import React from 'react';
 
 class Console extends React.Component{
 
@@ -31,14 +31,8 @@ class Console extends React.Component{
 
         this.props.reset_func(true)
 
-        /*console.log("You are in no voting")
-        this.props.input_handle('')
-        var reject=["Reject",true]
-        this.props.func_handle(reject)*/
     }
     render(){
-
-    console.log("Console",this.state.input)
       
       const mystyle = {
         color: "white",
@@ -51,10 +45,9 @@ class Console extends React.Component{
       };
   
       var button;
-      console.log(this.props.input)
+      
       if (this.props.input!=""){
-        console.log(this.props.feature)
-        console.log(this.props.input)
+        
         if (this.props.feature[0]=="AddPointOfInterest" ) {
             button=
             <div style={mystyle} >
@@ -74,12 +67,11 @@ class Console extends React.Component{
         }
         else if (this.props.feature[0]=="GivemeInfo") {
             var info_button,attributes=[];
-            console.log(this.props.input)
+            
             if (this.props.input.type=="apartment"){
                 for (const key in this.props.input){
                     attributes.push(key)
                 }
-                //console.log("Array of attributes is ",attributes)
                 
                 var answer = attributes.map((attribute, index) => {
                     return <li key={ index }>{attribute} : {this.props.input[attribute]} </li>; 

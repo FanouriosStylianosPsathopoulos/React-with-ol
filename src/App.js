@@ -9,7 +9,7 @@ import Buttons from './Buttons.js';
 import Console from './Console.js';
 
 
-import React, { useState, useEffect, useRef , Component} from 'react';
+import React, { useEffect, useRef , Component} from 'react';
 
 class App extends React.Component {
   constructor(props){
@@ -48,7 +48,7 @@ class App extends React.Component {
     this.setState({add_for_reject:arg})
   }
   Change_Reset(value){
-    console.log("Poses kai ti timh",this.state.reset_states,value)
+    
     this.setState({reset_states:value})
   }
 
@@ -63,7 +63,6 @@ class App extends React.Component {
   }
 
   Trigger_Func(){
-    console.log("Bre zwon")
     this.setState({map_functionality:["",""],sub_buttons:"",add_for_reject:'',input_message:'',address: ' ',coords_of_poi:'',poi_form:false,point_rejected:''})
   }
   Change_Map(map_arg){
@@ -71,21 +70,20 @@ class App extends React.Component {
   }
 
   Change_Address(address_arg){
-    console.log("address is ",address_arg)
     this.setState({address:address_arg})
   }
 
   Change_Input(message){
-    console.log("message is ",message)
+    
     this.setState({input_message:message})
-    console.log("Dead end")
+  
   }
 
   Change_Features(button_arg){
     // i will give the first argument only in the buttons except cancel
-      console.log("Button arg is ",button_arg)
+      
       if (button_arg[1]==true){
-        console.log("first",this.state.map_functionality)
+        
         this.setState({map_functionality:button_arg})
         
       }
@@ -107,7 +105,6 @@ class App extends React.Component {
         
         var array_as_arg=[string_to_use,button_arg[1]]
 
-        console.log("Array as arg",array_as_arg)
         this.setState({map_functionality:array_as_arg})
         
         if (this.state.input_message!=''){
@@ -119,17 +116,6 @@ class App extends React.Component {
 
 
   render(){
-
-    console.log("Attention to numerical first ",this.state.map_n)
-    console.log("Attention to numerical ",this.state.input_message)
-    console.log("Attention to numerical ",this.state.map_functionality)
-    console.log("Attention to numerical ",this.state.address)
-    console.log("Attention to numerical ",this.state.coords_of_poi)
-    console.log("Attention to numerical ",this.state.poi_form)
-    console.log("Attention to numerical ",this.state.point_rejected)
-    console.log("Attention to numerical states ",this.state.reset_states)
-    console.log("Attention to numerical states ",this.state.add_for_reject)
-    console.log("Attention to numerical states Last ",this.state.sub_buttons)
 
     return(
       <div className="App">

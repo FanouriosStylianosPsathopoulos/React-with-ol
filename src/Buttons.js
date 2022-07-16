@@ -30,20 +30,19 @@ class Buttons extends React.Component{
     }
 
     componentDidUpdate(prevProps, prevState, snapshot){
-        console.log("One",prevProps.reject,"two",this.props.reject,"Three",this.props.what_reject,this.state.enabled_button)
         if (prevProps.reject!=this.props.reject && ""!=this.props.reject && this.state.enabled_button=="AddPointOfInterest"){
             this.props.rejection_handle("")
-            console.log("1",prevProps.reject,"two",this.props.reject)
+            
             this.props.what_reject_func("")
             this.Change_Array_2([false,false])
-            console.log("show me sth ")
+            
             this.setState({poi_option:""})
             this.AddPointOfInterest()
         }
         else if (prevProps.reject!=this.props.reject && ""!=this.props.reject && this.state.enabled_button==="HomeForRent"){
             //this.props.what_reject_func("")
             this.props.rejection_handle("")
-            console.log("show me sth ")
+            
             this.Change_Array_2([false,false])
             this.setState({poi_option:""})
             this.HomeForRent()
@@ -78,7 +77,6 @@ class Buttons extends React.Component{
 
     DrawInput(){
 
-        console.log("starts draw")
         this.props.change_sub("")
 
         var array_as_arg=[true,true]
@@ -89,7 +87,7 @@ class Buttons extends React.Component{
         //enable the feature 
         var button_array=["Draw Point",true]
         this.props.func_handle(button_array)
-        console.log("ends draw")
+        
     }
 
     AddressInput(){
@@ -105,7 +103,7 @@ class Buttons extends React.Component{
     }
     GivemeInfo(){
         this.props.reset_func(false)
-        console.log("Message to see is: ",JSON.parse(localStorage.getItem("1")));
+        
         //disable first of all the rest of the buttons
         var array_of_bool= [true,false,true,true]
         //enable cancel
@@ -117,7 +115,7 @@ class Buttons extends React.Component{
     }
 
     AddPointOfInterest(){
-        console.log("Poi options is ",this.state.poi_option)
+        
         if (this.state.poi_option!=""){
             this.setState({poi_option:""})
             var array_as_arg=[false,false]
@@ -126,7 +124,7 @@ class Buttons extends React.Component{
 
             //this.Back_to_State()
 
-            console.log("edw mesa")
+            
             this.props.reset_func(true)
             this.Change_Array_2(array_as_arg)
         }
@@ -134,7 +132,7 @@ class Buttons extends React.Component{
         {
             this.props.reset_func(false)
         }
-        console.log("sth of whwat reject")
+        
         this.props.what_reject_func("POI")
         //disable first of all the rest of the buttons
         var array_of_bool= [true,true,false,true]
@@ -149,12 +147,7 @@ class Buttons extends React.Component{
         if (this.state.poi_option!=""){
             this.setState({poi_option:""})
             var array_as_arg=[false,false]
-            //var button_array=["",false]
-            //this.props.func_handle(button_array) 
-
-            //this.Back_to_State()
-
-            console.log("edw mesa")
+            
             this.props.reset_func(true)
             this.Change_Array_2(array_as_arg)
         }
@@ -167,15 +160,13 @@ class Buttons extends React.Component{
         //disable first of all the rest of the buttons
         var array_of_bool= [true,true,true,false]
 
-        //this.props.reset_func(false)
-        
         this.setState({disabled:array_of_bool , cancel:true , enabled_button: "HomeForRent" } )
        
 
     }
 
     Cancel(){
-        console.log('useful')
+        
         //enable all the rest of the buttons
         var array_of_bool= [false,false,false,false]
         var array_of_bool_2=[false,false]
@@ -193,10 +184,6 @@ class Buttons extends React.Component{
 
     render(){
 
-    console.log("Button Component first",this.state.cancel)
-    console.log("Button Component",this.state.disabled)
-    console.log("Button Component",this.state.enabled_button)
-    console.log("Button Component last",this.state.poi_option)
     var cancel_button;
 
     if (this.state.cancel==true){
@@ -239,7 +226,7 @@ class Buttons extends React.Component{
         <button onClick={this.AddressInput} disabled={this.state.disabled_2[1]}>Input with address </button>
         </div>
     }
-    console.log("button is ",buttons_for_poi)
+    
     return(
     <div>
     <button onClick={this.Polygon_Create} disabled={this.state.disabled[0]} >Interest Points </button>
@@ -259,29 +246,3 @@ class Buttons extends React.Component{
 }
 
 export default Buttons;
-/*
-function Renter(){
-    console.log("peta sta kalwdia ta airforce 3")
-    useEffect(() => {
-        console.log("peta sta kalwdia ta airforce 3")
-    });
-    return(
-        <div>
-        <button>Random</button>
-        <p>Renter</p>
-        </div>
-    )
-}
-
-function Landlord(){
-    useEffect(() => {
-        console.log("peta sta kalwdia ta airforce 2")
-    });
-    return(
-        <p>Landlord</p>
-    )
-}
-
-
-export {Renter,Landlord};
-*/

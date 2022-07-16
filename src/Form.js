@@ -1,6 +1,5 @@
 //react
-import { preventDefault } from 'ol/events/Event';
-import React, { useState, useEffect, useRef , Component} from 'react';
+import React from 'react';
 
 //json
 import {return_json} from './Create_json.js'
@@ -8,8 +7,6 @@ import {return_json} from './Create_json.js'
 //axios api 
 import {handle_connection} from './axios_api.js'
 
-//helper functions
-import {return_id} from './Helper_functons.js'
 
 class Form extends React.Component{
     constructor(props){
@@ -26,7 +23,7 @@ class Form extends React.Component{
         levels : "",
         year: "",
         squareMeters : "" ,
-        buildingFees: "",
+        price: "",
         description: "",
         boolean_of_address: false
       }
@@ -48,8 +45,8 @@ class Form extends React.Component{
 
     componentDidUpdate(prevProps, prevState, snapshot){
         if (prevProps.reset_button_1!=this.props.reset_button_1 && this.props.reset_button_1==true ){
-            console.log("Reset state")
-            this.setState({button_of_input:"",floor : "",boolean_of_address:false,squareMeters : "" ,buildingFees: "",description:'',year: "",levels : "",changing_input:"",address:"",console_log:false,select_value:"",submit_button:false })
+            
+            this.setState({button_of_input:"",floor : "",boolean_of_address:false,squareMeters : "" ,price: "",description:'',year: "",levels : "",changing_input:"",address:"",console_log:false,select_value:"",submit_button:false })
           }
     }
 
@@ -58,7 +55,7 @@ class Form extends React.Component{
     }
 
     Handle_Fees(event){
-        this.setState({buildingFees:event.target.value })
+        this.setState({price:event.target.value })
     }
     Handle_Meters(event){
         this.setState({squareMeters:event.target.value })
@@ -77,15 +74,15 @@ class Form extends React.Component{
 
     Submit_apartment(event){
         event.preventDefault()
-        console.log("message 2")
-        if (this.state.floor=='' || this.state.levels=='' || this.state.year=='' || this.state.squareMeters=='' || this.state.buildingFees=='' ){
-            console.log("alliws edw ")
+        
+        if (this.state.floor=='' || this.state.levels=='' || this.state.year=='' || this.state.squareMeters=='' || this.state.price=='' ){
+            
             this.props.input_handle("You have to fill all the fields to be able to submit.")
             this.setState({submit_button:true })
         }
         else {
-            console.log("message ")
-            var comb_of_data=[this.props.coords,this.state.floor,this.state.levels,this.state.year,this.state.squareMeters,this.state.buildingFees,this.state.description]
+            
+            var comb_of_data=[this.props.coords,this.state.floor,this.state.levels,this.state.year,this.state.squareMeters,this.state.price,this.state.description]
             var json=return_json("Home",comb_of_data)
             
             console.log("Home is  ",JSON.stringify(json, null, 2));
@@ -97,11 +94,11 @@ class Form extends React.Component{
                 // got value here
                 data=val
             
-                console.log("Print this",data)
+                
         }
             )
             this.props.reset_func_1(true)
-            console.log("Asynchronous")
+            
 
 
             //change everything to default buttons 
@@ -123,7 +120,7 @@ class Form extends React.Component{
 }
     Submit_Poi(event){
         event.preventDefault()
-        console.log(this.props.coords,this.state.select_value)
+        
         if (this.state.select_value==''){
             this.props.input_handle("You have to pick an option to be able to submit the point of interest.")
             this.setState({submit_button:true })
@@ -146,25 +143,13 @@ class Form extends React.Component{
             
                 console.log("Print this",data)
 
-                //save id to local storage along side with the lang lat
-                
-                var id=return_id(data);
-
-                localStorage.setItem("1", JSON.stringify(data));
-
-                
-                
-                console.log("Message to see is: ",JSON.parse(localStorage.getItem("1")));
-
-                //inside_this.props.input_handle(data)
             })
 
             
             
             
             this.props.reset_func_1(true)
-            console.log("Asynchronous")
-
+            
 
             //change everything to default buttons 
 
@@ -210,15 +195,8 @@ class Form extends React.Component{
 
     render(){
 
-        console.log("FOorm first",this.state.address)
-        console.log("FOorm",this.state.button_of_input)
-        console.log("FOorm",this.state.changing_input)
-        console.log("FOorm",this.state.console_log)
-        console.log("FOorm",this.state.select_value)
-        console.log("FOorm last",this.state.submit_button)
         var button_to_render,submit_alert='';
-        console.log(this.props.input)
-        console.log(this.props.button_)
+    
         if (this.props.input=="draw"){
             if (this.props.poi_value == true && this.props.button_ == "AddPointOfInterest"){
                 if (this.state.submit_button){
@@ -241,7 +219,7 @@ class Form extends React.Component{
             else if (this.props.poi_value == true && this.props.button_ == "HomeForRent"){
                 //form for this 
                  //form
-                 console.log("Form with address ")
+                
 
                  //prerequisites
                  var select = '',items=[],squares=[],fees=[];
@@ -253,7 +231,7 @@ class Form extends React.Component{
                      squares.push(<option key={i} value={i}>{i}</option>); 
                  }
  
-                 for (var i=0;i<30;i++){
+                 for (var i=100;i<1000;i++){
                      fees.push(<option key={i} value={i}>{i}</option>); 
                  }
                  if (this.state.submit_button){
@@ -287,7 +265,7 @@ class Form extends React.Component{
                      <label>Pick the year the house was built </label>
                      <select defaultValue='' onChange={this.Handle_Year} >
                      <option disabled value=''> -- select an option -- </option>
-                     {console.log("select",items)}
+                     
                      {items}
                      
                      </select>
@@ -295,15 +273,15 @@ class Form extends React.Component{
                      <label>Pick the square meters of the house </label>
                      <select defaultValue='' onChange={this.Handle_Meters} >
                      <option disabled value=''> -- select an option -- </option>
-                     {console.log("select",items)}
+                     
                      {squares}
                      
                      </select>
                      <br></br>
-                     <label>Building Fees</label>
+                     <label>Building Rent</label>
                      <select defaultValue='' onChange={this.Handle_Fees} >
                      <option disabled value=''> -- select an option -- </option>
-                     {console.log("select",items)}
+                     
                      {fees}
                      
                      </select>
@@ -347,7 +325,6 @@ class Form extends React.Component{
             else if (this.props.poi_value == true && this.props.button_ == "HomeForRent"){
                 
                 //form
-                console.log("Form with address ")
 
                 //prerequisites
                 var select = '',items=[],squares=[],fees=[];
@@ -393,7 +370,7 @@ class Form extends React.Component{
                     <label>Pick the year the house was built </label>
                     <select defaultValue='' onChange={this.Handle_Year} >
                     <option disabled value=''> -- select an option -- </option>
-                    {console.log("select",items)}
+                    
                     {items}
                     
                     </select>
@@ -401,15 +378,15 @@ class Form extends React.Component{
                     <label>Pick the square meters of the house </label>
                     <select defaultValue='' onChange={this.Handle_Meters} >
                     <option disabled value=''> -- select an option -- </option>
-                    {console.log("select",items)}
+                    
                     {squares}
                     
                     </select>
                     <br></br>
-                    <label>Building Fees</label>
+                    <label>Building Rent</label>
                     <select defaultValue='' onChange={this.Handle_Fees} >
                     <option disabled value=''> -- select an option -- </option>
-                    {console.log("select",items)}
+                    
                     {fees}
                     
                     </select>
@@ -434,54 +411,3 @@ class Form extends React.Component{
 
 }
 export default Form;
-/*
-function Pass_Address(props){
-    
-    useEffect(() => {
-        console.log("peta sta kalwdia ta airforce 1")
-    });
-    
-    return(
-        <div>
-            {console.log("sout")}
-            A message that is {props.address}
-        </div>
-    )
-}
-function Make_Form(){
-    console.log("form")
-    const [address, setAddress] = useState("");
-    const [bool_var,setBool]=useState("False")
-    const handleChange = (evt) => {
-        setAddress(evt.target.value)
-    }
-
-    const button_func=(event)=>{
-        //setBool("True");
-        console.log("sthe")
-        //return <Pass_Address address= {address} />
-        preventDefault(event);
-        console.log("okkk")
-        return <Pass_Address address_prop= {address} />
-    }
-
-
-
-
-    return(
-        <div>
-            <form>Give Address that you want the map to center:  
-            <input type="text" id="lname" name="lname" value={address} onChange={handleChange}  />
-            <button onClick={button_func}>
-            Submit 
-            </button>
-            </form>
-        </div>
-    )
-}
-
-
-
-
-
-export {Make_Form,Pass_Address}; */
