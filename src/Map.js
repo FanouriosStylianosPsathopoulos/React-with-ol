@@ -9,7 +9,12 @@ import './Map.css';
 //json
 import {return_json} from './Create_json.js'
 //swagger openapi
-import {ApartmentControllerApi} from './generated_sources/openapi/apis/';
+
+//import {ApartmentControllerApi} from './generated_sources/openapi/apis/ApartmentControllerApi.ts';
+
+//axios api 
+import {handle_connection} from './axios_api.js'
+
 
 // openlayers
 import Map from 'ol/Map';
@@ -43,11 +48,17 @@ class Render_Map extends React.Component{
     this.Destroy_Info=this.Destroy_Info.bind(this);
     this.AddPointOfInterest_withArcGis=this.AddPointOfInterest_withArcGis.bind(this);
     this.Reject_The_Point=this.Reject_The_Point.bind(this)
+    this.Draw_Single_Point_on_Map=this.Draw_Single_Point_on_Map.bind(this)
+    this.Single_Point=this.Single_Point.bind(this)
     //this.AddPointOfInterest=this.AddPointOfInterest.bind(this);
-    //this.RemovePointsofInterest=this.RemovePointsofInterest.bind(this)
+    this.AddApartment_withArcGis=this.AddApartment_withArcGis.bind(this)
+    this.RemovePointsofInterest=this.RemovePointsofInterest.bind(this)
+    this.Reset_state=this.Reset_state.bind(this)
+    this.Point_added=this.Point_added.bind(this)
     this.state={
       map_n: '',
-      event_k: ''
+      event_k: '',
+      point_added:false
     }
   }
 
@@ -57,7 +68,7 @@ class Render_Map extends React.Component{
     });
 
     const map = new Map({
-      controls: defaultControls(),
+      controls: defaultControls({ attribution: false }),
       layers: [raster],
       target: this.map_element.current,
       view: new View({
@@ -73,7 +84,11 @@ class Render_Map extends React.Component{
     this.props.func_handle(map)
 }
 
-  AddPointOfInterest_withArcGis(){
+  Point_added(arg){
+    this.setState({point_added:arg})
+  }
+
+  AddApartment_withArcGis(){
     const apiKey='AAPK4f3d7610cd654ce19c5f022d71cfbbd46lSICiq2GPfHm7h6fRrKXG4GL5WBYc22ZwVIG38cKg5U_fUydC2y_s0DkhOsMbNI'
     const basemapId = "ArcGIS:Navigation";
     const basemapURL = "https://basemaps-api.arcgis.com/arcgis/rest/services/styles/" + basemapId + "?type=style&token=" + apiKey;
@@ -104,6 +119,7 @@ class Render_Map extends React.Component{
 
     const coords = [result.location.x, result.location.y];
 
+    console.log("Arcgis is ",coords)
     this.props.coord_change(coords); 
 
     this.state.map_n.getView().setCenter(coords);
@@ -139,6 +155,7 @@ class Render_Map extends React.Component{
     console.log("New features are",new_features)
 
     var right_ones=transform(coords, 'EPSG:3857','EPSG:4326');
+    this.props.coord_change(right_ones); 
     new_features.push(new Feature({
               
         geometry: new Point(fromLonLat([
@@ -152,12 +169,112 @@ class Render_Map extends React.Component{
           ]))
           })
     
+    this.Point_added(true)
     specific.getSource().addFeature(new_feature_to_make); 
     
     specific.changed()
 
     this.props.func_handle(this.state.map_n) //update map 
 
+    
+    //see if u want to keep the point 
+
+    this.props.input_handle("New_Point")
+  
+    
+})
+
+
+  }
+  AddPointOfInterest_withArcGis(){
+    const apiKey='AAPK4f3d7610cd654ce19c5f022d71cfbbd46lSICiq2GPfHm7h6fRrKXG4GL5WBYc22ZwVIG38cKg5U_fUydC2y_s0DkhOsMbNI'
+    const basemapId = "ArcGIS:Navigation";
+    const basemapURL = "https://basemaps-api.arcgis.com/arcgis/rest/services/styles/" + basemapId + "?type=style&token=" + apiKey;
+
+    const authentication = new ApiKey({
+        key: apiKey
+      });
+
+    const center = transform(this.state.map_n.getView().getCenter(), "EPSG:3857", "EPSG:4326");
+    
+    geocode({
+      singleLine: this.props.address,
+      authentication,
+
+      params: {
+        outFields: "*",
+        location: center.join(","),
+        outSR: 3857 // Request coordinates in Web Mercator to simplify displaying
+      }
+    }).then((response) => {
+
+    const result = response.candidates[0];
+
+    if (result == null) {
+        alert("That query didn't match any geocoding results.");
+        return;
+      }
+
+    const coords = [result.location.x, result.location.y];
+
+    console.log("Arcgis is ",coords)
+    this.props.coord_change(coords); 
+
+    this.state.map_n.getView().setCenter(coords);
+
+    var specific=this.state.map_n.getAllLayers()[1]
+
+    console.log("Specific is ",specific)
+
+    //two cases , no defined layer
+    if (specific==null){
+      //create layer and add it to map 
+      var features=[];
+      const vectorSource = new VectorSource({
+        features
+      });
+    
+      const vectorLayer = new VectorLayer({
+          source: vectorSource,
+          style: new Style({
+              image: new CircleStyle({
+              radius: 5,
+              fill: new Fill({color: 'red'})
+            })
+          })
+        });
+
+      this.state.map_n.addLayer(vectorLayer);
+      specific=this.state.map_n.getAllLayers()[1]
+    }
+
+    var new_features=[...specific.getSource().getFeatures()]
+
+    console.log("New features are",new_features)
+
+    var right_ones=transform(coords, 'EPSG:3857','EPSG:4326');
+    this.props.coord_change(right_ones); 
+    new_features.push(new Feature({
+              
+        geometry: new Point(fromLonLat([
+          right_ones[0], right_ones[1]
+        ]))
+        }));
+
+        var new_feature_to_make= new Feature({ 
+          geometry: new Point(fromLonLat([
+            right_ones[0], right_ones[1]
+          ]))
+          })
+    this.Point_added(true)
+    
+    specific.getSource().addFeature(new_feature_to_make); 
+    
+    specific.changed()
+
+    this.props.func_handle(this.state.map_n) //update map 
+
+    
     //see if u want to keep the point 
 
     this.props.input_handle("New_Point")
@@ -170,43 +287,237 @@ class Render_Map extends React.Component{
 
   componentDidUpdate(prevProps, prevState, snapshot){
     //console.log("Props are ",this.props)
+    var interactions=this.state.map_n.getInteractions()
+    console.log("intereactions are 2 ",interactions)
     if (prevProps.map_features!=this.props.map_features){
       console.log("Props are ",this.props,this.props.map_features[0])
+      console.log(this.props.map_features)
       if (this.props.map_features[0]=="Polygon_Create"){
         if (this.props.map_features[1]==true){ //create feature 
           this.Polygon_Create()
         }
-        else {
-          this.Destroy_Feature()
-        }
+  
     }
       else if (this.props.map_features[0]=="GivemeInfo"){
         if (this.props.map_features[1]==true){ //create feature 
           this.GivemeInfo()
         }
-        else {
-          this.Destroy_Info()
-        }
+
       }
       else if (this.props.map_features[0]=="Address"){
         if (this.props.map_features[1]==true){ //create feature 
           this.AddPointOfInterest_withArcGis()
         }
-        else {
-          this.RemovePointsofInterest()
+  
+      }
+      else if (this.props.map_features[0]=="Draw Point"){
+        if (this.props.map_features[1]==true){ //create feature 
+          this.Draw_Single_Point_on_Map();
+        }
+        
+      }
+      else if (this.props.map_features[0]=="Add Apartment Address"){
+        if (this.props.map_features[1]==true){ //create feature 
+          this.AddPointOfInterest_withArcGis()
         }
       }
-      else if (this.props.map_features[0]=="Reject"){
+     /* else if (this.props.map_features[0]=="Reject"){
+        console.log("EDW POSES FORES GAMW ",this.props.map_features)
         //reject the point
           this.Reject_The_Point()
+          var interactions=this.state.map_n.getInteractions()
+          if (interactions!=null){
+            interactions.pop()
+            this.props.func_handle(this.state.map_n)
+        }
         //reset the option for poi
+
           this.props.rejection_handle("Reject_of_poi")
-      }
+          console.log("to etrexes")
+        } */
   }
+
+  console.log(prevProps.reset_button,this.props.reset_button)
+  if (prevProps.reset_button!=this.props.reset_button && this.props.reset_button==true ){
+    this.Reset_state()
+  }
+
+  if (prevProps.sub!=this.props.sub && this.props.sub=="Address"){
+    var interactions=this.state.map_n.getInteractions()
+    if (interactions!=null ){
+      interactions.pop()
+      this.props.func_handle(this.state.map_n)
+      }
+    }
 }
 
+  Draw_Single_Point_on_Map(){
+    console.log("Single point on Map ")
+    let draw; 
+    const source = new VectorSource({wrapX: false});
+    const value = "Point";
+    if (value !== 'None') {
+      draw = new Draw({
+        source: source,
+        type: value,
+    });
+    
+    draw.on('drawend',this.Single_Point )
+    this.state.map_n.addInteraction(draw);
+    this.props.func_handle(this.state.map_n)
+
+  }
+  
+}
+
+Reset_state(){
+  //check polygon interaction
+  console.log("Re kwlopaidi",this.props.map_features)
+  if (this.props.map_features[0]=="Polygon_Create"){
+    this.Destroy_Feature()
+    this.props.trigger_func()
+  }
+  else if (this.props.map_features[0]=="GivemeInfo"){
+    this.props.trigger_func()
+    this.Destroy_Info()
+  }
+  else if (this.props.map_features[0]=="Address"){
+    this.Reject_The_Point();
+
+    this.props.trigger_func()
+
+    this.props.reset_func(false)
+
+  }
+  else if (this.props.map_features[0]=="Draw Point"){
+    console.log("Optimistic ")
+    //this.props.reset_func(false)
+    this.Reject_The_Point();
+    var interactions=this.state.map_n.getInteractions()
+    console.log("intereactions are ",interactions)
+    if (interactions!=null){
+      interactions.pop()
+      this.props.func_handle(this.state.map_n)
+      }
+      interactions=this.state.map_n.getInteractions()
+      console.log("intereactions are ",interactions)
+      this.props.trigger_func()
+      this.props.reset_func(false)
+
+  }
+  else if (this.props.map_features[0]==""){
+    //check if any feature must be removed
+    console.log("edw mallon gia to keno")
+    var interactions=this.state.map_n.getInteractions()
+    console.log("intereactions are ",interactions)
+    console.log("mphke 1")
+    if (interactions!=null && interactions.length>8){
+    console.log("mphke 2")
+    interactions.pop()
+    this.props.func_handle(this.state.map_n)
+    
+    }
+    console.log("mphke 3")
+    //interactions=this.state.map_n.getInteractions()
+    //console.log("intereactions are ",interactions)
+    this.props.trigger_func()
+    this.props.reset_func(false)
+  }
+  else if (this.props.map_features[0]=="Reject"){
+    console.log("edw pera")
+    this.Reject_The_Point();
+    this.props.trigger_func()
+    this.props.reset_func(false)
+    this.props.rejection_handle("Reject_of_poi")
+  }
+}
+RemovePointsofInterest(){
+  console.log("Remove")
+  var interactions=this.state.map_n.getInteractions()
+  if (interactions!=null){
+  interactions.pop()
+  }
+  
+  this.props.func_handle(this.state.map_n)
+}
+  Single_Point(evt){
+
+    console.log("Not")
+    //const features = [];
+
+    //get the coords
+    var array_temp=evt.feature.getGeometry().getCoordinates();
+
+    var specific=this.state.map_n.getAllLayers()[1]
+
+    console.log("Specific is ",specific)
+
+    //two cases , no defined layer
+    if (specific==null){
+      //create layer and add it to map 
+      var features=[];
+      const vectorSource = new VectorSource({
+        features
+      });
+    
+      const vectorLayer = new VectorLayer({
+          source: vectorSource,
+          style: new Style({
+              image: new CircleStyle({
+              radius: 5,
+              fill: new Fill({color: 'red'})
+            })
+          })
+        });
+
+      this.state.map_n.addLayer(vectorLayer);
+      specific=this.state.map_n.getAllLayers()[1]
+    }
+
+    var new_features=[...specific.getSource().getFeatures()]
+
+    console.log("New features are",new_features)
+
+    var right_ones=transform(array_temp, 'EPSG:3857','EPSG:4326');
+    new_features.push(new Feature({
+              
+        geometry: new Point(fromLonLat([
+          right_ones[0], right_ones[1]
+        ]))
+        }));
+
+        var new_feature_to_make= new Feature({ 
+          geometry: new Point(fromLonLat([
+            right_ones[0], right_ones[1]
+          ]))
+          })
+    
+    this.props.coord_change(right_ones); 
+    specific.getSource().addFeature(new_feature_to_make); 
+    
+    specific.changed()
+
+
+
+    this.Point_added(true)
+    this.props.func_handle(this.state.map_n) //update map 
+
+    var interactions=this.state.map_n.getInteractions()
+    if (interactions!=null){
+    interactions.pop()
+    }
+
+    console.log("Ws edw ")
+    //see if u want to keep the point 
+
+    this.props.input_handle("New_Point")
+    
+  }
 
   Reject_The_Point(){
+    console.log("U are trying to reject point ")
+    if(this.state.point_added==true){
+    console.log("U are inside of reject ")
     var specific=this.state.map_n.getAllLayers()[1]
 
     var new_features=[...specific.getSource().getFeatures()]
@@ -217,9 +528,14 @@ class Render_Map extends React.Component{
     
     specific.changed();
     
-
+    this.Point_added(false)
     this.props.func_handle(this.state.map_n)
+    
+    }
   }
+
+
+
   GivemeInfo(evt){
     //define the on event
     const inside_this=this //global
@@ -235,21 +551,34 @@ class Render_Map extends React.Component{
         //give console input
         var msg_string,json='',coords;
         if (feature==null){
-          msg_string="This is not a legit point of interest to give you info about"
+          msg_string="This is not a legit validated point to give you info about"
+          inside_this.props.input_handle(msg_string)
         }
         else {
           coords=transform(feature.getGeometry().getCoordinates(), 'EPSG:3857','EPSG:4326') 
           var msg_string="The coords of the feature are: " + transform(feature.getGeometry().getCoordinates(), 'EPSG:3857','EPSG:4326')
-          
+          console.log(msg_string)
           json=return_json("Info_Point",coords)
           console.log("Info point is ",JSON.stringify(json, null, 2))
 
+          //var right_ones=transform(coords, 'EPSG:3857','EPSG:4326');
           //send the coords 
+          var data;
 
+          handle_connection("POST","pointInfo",json).then(val => {
+              // got value here
+              data=val
+          
+              console.log("Print this",data.description)
+              inside_this.props.input_handle(data)
+          })
+
+          //console.log("tsouftsis")
+          //msg_string=data;
 
         }
 
-        inside_this.props.input_handle(msg_string)
+        //inside_this.props.input_handle(msg_string)
       
     })
     this.setState({event_k:event_key})
@@ -260,22 +589,156 @@ class Render_Map extends React.Component{
   Polygon_Behaviour(evt){
     //get the coords
     var array_temp=evt.feature.getGeometry().getCoordinates();
+    //var right_ones=transform(array_temp, 'EPSG:3857','EPSG:4326') 
+    //console.log("Sick and tired",array_temp)
+    //console.log("Bre makaka",array_temp[0][0],transform(array_temp[0], 'EPSG:3857','EPSG:4326'))
+    var right_ones = array_temp[0].map(x=> transform(x, 'EPSG:3857','EPSG:4326') )
+    
+    console.log("Previous are ",array_temp[0])
+    //console.log(right_ones)
+    
+    array_temp[0]=right_ones
+    
+    ///array_temp[0].push(array_temp[0][0])
+
     //make json to send to back-end
+    
     var json=return_json("Polygon_json",array_temp)
 
+    
+
+
     console.log("Json is: ",JSON.stringify(json, null, 2));
+    //console.log("Right ones",right_ones)
     //send them to back-end and get Interesting Points
     //Send_Coords
     
+    var data;
 
-    this.Draw_Points(array_temp[0][0])
+    handle_connection("POST","Polygon_Area",json).then(val => {
+      // got value here
+      data=val
+  
+      console.log("Print this",data)
+      //inside_this.props.input_handle(data)
+      
+      if (data.general_points!=null){
+        console.log("Not null")
+        this.Draw_Points(data.general_points)
+      }
+
+  })
+
+    //this.Draw_Points(array_temp[0][0])
+
 
     
 
   }
 
   Draw_Points(array_with_coords){
-    const features = [];
+    var features = [], new_feature_to_make ;
+    for (var i = 0; i <array_with_coords.length ; i++) {
+      //var right_coords=transform(array_with_coords,'EPSG:3857','EPSG:4326')
+      
+      var right_coords=[array_with_coords[i].longitude,array_with_coords[i].latitude]
+      //right_coords=transform(array_with_coords,'EPSG:4326','EPSG:3857')
+      console.log("Right coords are ",right_coords)
+      features.push(right_coords);
+
+        new_feature_to_make= new Feature({ 
+          geometry: new Point(fromLonLat([
+            right_coords[0], right_coords[1]
+          ]))
+          })
+        console.log("Right results",new_feature_to_make)
+    } 
+   
+    console.log("Feature coords are ",features)
+
+    new_feature_to_make= new Feature({ 
+          geometry: new Point(fromLonLat(
+            features
+          ))
+          })
+
+    console.log("Wrons results",new_feature_to_make)
+    
+    var specific=this.state.map_n.getAllLayers()[1]
+
+    console.log("Specific is ",specific)
+
+    //two cases , no defined layer
+    if (specific==null){
+      //create layer and add it to map 
+      console.log("so")
+      var empty_set=[]
+      const vectorSource = new VectorSource({
+        empty_set
+      });
+    
+      const vectorLayer = new VectorLayer({
+          source: vectorSource,
+          style: new Style({
+              image: new CircleStyle({
+              radius: 5,
+              fill: new Fill({color: 'red'})
+            })
+          })
+        });
+
+      this.state.map_n.addLayer(vectorLayer);
+      specific=this.state.map_n.getAllLayers()[1]
+    }
+
+    console.log(specific)
+    var new_features=[...specific.getSource().getFeatures()]
+
+    console.log("New features are",new_features)
+
+
+    for (var i = 0; i <array_with_coords.length ; i++) {
+      //var right_coords=transform(array_with_coords,'EPSG:3857','EPSG:4326')
+      
+      var right_coords=[array_with_coords[i].longitude,array_with_coords[i].latitude]
+      //right_coords=transform(array_with_coords,'EPSG:4326','EPSG:3857')
+      console.log("Right coords are ",right_coords)
+      //features.push(right_coords);
+
+        new_feature_to_make= new Feature({ 
+          geometry: new Point(fromLonLat([
+            right_coords[0], right_coords[1]
+          ]))
+          })
+        specific.getSource().addFeature(new_feature_to_make); 
+        console.log("Right results",new_feature_to_make)
+    } 
+
+    //var right_ones=transform(coords, 'EPSG:3857','EPSG:4326');
+    //this.props.coord_change(right_ones); 
+    /*new_features.push(new Feature({
+              
+        geometry: new Point(fromLonLat([
+          right_ones[0], right_ones[1]
+        ]))
+        }));
+
+      var new_feature_to_make= new Feature({ 
+          geometry: new Point(fromLonLat([
+            right_ones[0], right_ones[1]
+          ]))
+          }) */
+    
+    //specific.getSource().addFeature(new_feature_to_make); 
+    
+    specific.changed()
+
+    console.log("New features are",specific.getSource().getFeatures())
+
+    this.props.func_handle(this.state.map_n) //update map 
+
+
+    /* const features = [];
     const getRandomNumber = function (min, ref) {
       return Math.random() * ref + min;
     }
@@ -305,7 +768,7 @@ class Render_Map extends React.Component{
 
     this.state.map_n.addLayer(vectorLayer);
 
-    this.props.func_handle(this.state.map_n);
+    //this.props.func_handle(this.state.map_n); */
 
 
 }
@@ -317,6 +780,7 @@ class Render_Map extends React.Component{
     this.setState({event_key:''})
   }
   Destroy_Feature(){
+    console.log("tsoutse")
     var interactions=this.state.map_n.getInteractions()
     interactions.pop()
     this.props.func_handle(this.state.map_n)
@@ -341,6 +805,9 @@ class Render_Map extends React.Component{
   }
 
   render(){
+    console.log("Just the Map render first ",this.state.map_n)
+    console.log("Just the Map render  ",this.state.event_k)
+    console.log("Just the Map render last ",this.state.point_added)
 
     return(
       <div>

@@ -24,11 +24,21 @@ class Console extends React.Component{
 
     no_func(){
         //reject the point 
+        var button_array=["Reject",false]
+        this.props.func_handle(button_array) 
+        this.props.input_handle('')
+        //this.Back_to_State()
+
+        this.props.reset_func(true)
+
+        /*console.log("You are in no voting")
         this.props.input_handle('')
         var reject=["Reject",true]
-        this.props.func_handle(reject)
+        this.props.func_handle(reject)*/
     }
     render(){
+
+    console.log("Console",this.state.input)
       
       const mystyle = {
         color: "white",
@@ -44,7 +54,8 @@ class Console extends React.Component{
       console.log(this.props.input)
       if (this.props.input!=""){
         console.log(this.props.feature)
-        if (this.props.feature[0]=="AddPointOfInterest") {
+        console.log(this.props.input)
+        if (this.props.feature[0]=="AddPointOfInterest" ) {
             button=
             <div style={mystyle} >
             <h3> Console </h3>
@@ -54,21 +65,49 @@ class Console extends React.Component{
             </div>
         
         }
+        else if (this.props.input=="This is not a legit validated point to give you info about"){
+            button=<div style={mystyle} >
+            <h3> Console </h3>
+            <p>{this.props.input}</p>
+            
+            </div>
+        }
         else if (this.props.feature[0]=="GivemeInfo") {
+            var info_button,attributes=[];
+            console.log(this.props.input)
+            if (this.props.input.type=="apartment"){
+                for (const key in this.props.input){
+                    attributes.push(key)
+                }
+                //console.log("Array of attributes is ",attributes)
+                
+                var answer = attributes.map((attribute, index) => {
+                    return <li key={ index }>{attribute} : {this.props.input[attribute]} </li>; 
+               });
+                info_button=<ul>{answer}</ul>
+           
+            }
+            else if (this.props.input=="Hospital" || this.props.input=="Market" || this.props.input=="School"){
+                info_button="This is a " + this.props.input
+            }
+            
+
             button=
             <div style={mystyle} >
             <h3> Console </h3>
-            <p>
-                {this.props.input}
-            </p>
+            <div>
+            {info_button}
+            </div>
+                
+            
             </div>
         }
-        else if (this.props.feature[0]=="Address") {
-            if (this.props.input=="You have to pick an option to be able to submit the point of interest."){
+        else if (this.props.feature[0]=="Address" || this.props.feature[0]=="Draw Point" ) {
+            if (this.props.input=="You have to pick an option to be able to submit the point of interest." || this.props.input=="You have to fill all the fields to be able to submit."){
                 button=<div style={mystyle} >
                 <h3> Console </h3>
                     
-                <p>You have to pick an option to be able to submit the point of interest.</p>
+                <p>{this.props.input}</p>
             
                 </div>
             }

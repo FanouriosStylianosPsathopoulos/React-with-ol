@@ -1,3 +1,4 @@
+import { toHaveDisplayValue } from '@testing-library/jest-dom/dist/matchers.js';
 import { toStringHDMS } from 'ol/coordinate';
 import React, { useState, useEffect, useRef , Component} from 'react';
 import Form from './Form.js';
@@ -14,8 +15,13 @@ class Buttons extends React.Component{
         this.Cancel=this.Cancel.bind(this)
         this.DrawInput=this.DrawInput.bind(this)
         this.AddressInput=this.AddressInput.bind(this)
+        this.Change_Array_=this.Change_Array_.bind(this)
+        this.Change_Input_Poi=this.Change_Input_Poi.bind(this)
+        this.Back_to_State=this.Back_to_State.bind(this)
+        this.Change_Array_2=this.Change_Array_2.bind(this)
 
         this.state={
+            disabled_2:[false,false],
             disabled: [false,false,false,false],
             cancel : false,
             enabled_button: "",
@@ -24,13 +30,35 @@ class Buttons extends React.Component{
     }
 
     componentDidUpdate(prevProps, prevState, snapshot){
-        if (prevProps.reject!=this.props.reject){
+        console.log("One",prevProps.reject,"two",this.props.reject,"Three",this.props.what_reject,this.state.enabled_button)
+        if (prevProps.reject!=this.props.reject && ""!=this.props.reject && this.state.enabled_button=="AddPointOfInterest"){
+            this.props.rejection_handle("")
+            console.log("1",prevProps.reject,"two",this.props.reject)
+            this.props.what_reject_func("")
+            this.Change_Array_2([false,false])
             console.log("show me sth ")
             this.setState({poi_option:""})
             this.AddPointOfInterest()
         }
+        else if (prevProps.reject!=this.props.reject && ""!=this.props.reject && this.state.enabled_button==="HomeForRent"){
+            //this.props.what_reject_func("")
+            this.props.rejection_handle("")
+            console.log("show me sth ")
+            this.Change_Array_2([false,false])
+            this.setState({poi_option:""})
+            this.HomeForRent()
+        }
+    }
+    Change_Array_2(val){
+        this.setState({disabled_2:val})
+    }
+
+    Change_Array_(array_of_bool,cancel_val,enabled_button_val,array_of_bool_2){
+        this.setState({disabled:array_of_bool , cancel:cancel_val , enabled_button: enabled_button_val,disabled_2:array_of_bool_2} )
     }
     Polygon_Create(){
+        this.props.reset_func(false)
+        //this.props.reset_func(true)
         //disable first of all the rest of the buttons
         var array_of_bool= [false,true,true,true]
         //enable cancel
@@ -41,14 +69,43 @@ class Buttons extends React.Component{
         this.props.func_handle(button_array)
     }
 
+    Back_to_State(){
+        //put everything back to normal 
+
+        //trigger app component to do the same thing
+        this.props.trigger_func()
+    }
+
     DrawInput(){
+
+        console.log("starts draw")
+        this.props.change_sub("")
+
+        var array_as_arg=[true,true]
+
+        this.Change_Array_2(array_as_arg)
+        
         this.setState({poi_option:"draw"})
+        //enable the feature 
+        var button_array=["Draw Point",true]
+        this.props.func_handle(button_array)
+        console.log("ends draw")
     }
 
     AddressInput(){
+        this.props.change_sub("Address")
+        var array_as_arg=[true,true]
+
+        this.Change_Array_2(array_as_arg)
         this.setState({poi_option:"address"})
     }
+
+    Change_Input_Poi(poi_option_val){
+        this.setState({poi_option:poi_option_val})
+    }
     GivemeInfo(){
+        this.props.reset_func(false)
+        console.log("Message to see is: ",JSON.parse(localStorage.getItem("1")));
         //disable first of all the rest of the buttons
         var array_of_bool= [true,false,true,true]
         //enable cancel
@@ -60,37 +117,86 @@ class Buttons extends React.Component{
     }
 
     AddPointOfInterest(){
-        console.log("sth")
+        console.log("Poi options is ",this.state.poi_option)
+        if (this.state.poi_option!=""){
+            this.setState({poi_option:""})
+            var array_as_arg=[false,false]
+            //var button_array=["",false]
+            //this.props.func_handle(button_array) 
+
+            //this.Back_to_State()
+
+            console.log("edw mesa")
+            this.props.reset_func(true)
+            this.Change_Array_2(array_as_arg)
+        }
+        else
+        {
+            this.props.reset_func(false)
+        }
+        console.log("sth of whwat reject")
+        this.props.what_reject_func("POI")
         //disable first of all the rest of the buttons
         var array_of_bool= [true,true,false,true]
         //enable cancel
         this.setState({disabled:array_of_bool , cancel:true , enabled_button: "AddPointOfInterest"} )
 
-        /*
-        //enable the feature 
-        var button_array=["AddPointOfInterest",true]
-        this.props.func_handle(button_array)*/
+    
     }
 
     HomeForRent(){
+
+        if (this.state.poi_option!=""){
+            this.setState({poi_option:""})
+            var array_as_arg=[false,false]
+            //var button_array=["",false]
+            //this.props.func_handle(button_array) 
+
+            //this.Back_to_State()
+
+            console.log("edw mesa")
+            this.props.reset_func(true)
+            this.Change_Array_2(array_as_arg)
+        }
+        else
+        {
+            this.props.reset_func(false)
+        }
+        //home
+        this.props.what_reject_func("Home")
         //disable first of all the rest of the buttons
         var array_of_bool= [true,true,true,false]
-        //enable cancel
+
+        //this.props.reset_func(false)
+        
         this.setState({disabled:array_of_bool , cancel:true , enabled_button: "HomeForRent" } )
+       
+
     }
 
     Cancel(){
+        console.log('useful')
         //enable all the rest of the buttons
         var array_of_bool= [false,false,false,false]
+        var array_of_bool_2=[false,false]
         //disable cancel
-        this.setState({disabled:array_of_bool , cancel:false , enabled_button: "" } )
+        this.setState({disabled:array_of_bool , disabled_2:array_of_bool_2 , cancel:false , enabled_button: "",poi_option:'' } )
 
         var button_array=["",false]
-        this.props.func_handle(button_array)
+        this.props.func_handle(button_array) 
+
+        //this.Back_to_State()
+
+        this.props.reset_func(true)
     }
 
 
     render(){
+
+    console.log("Button Component first",this.state.cancel)
+    console.log("Button Component",this.state.disabled)
+    console.log("Button Component",this.state.enabled_button)
+    console.log("Button Component last",this.state.poi_option)
     var cancel_button;
 
     if (this.state.cancel==true){
@@ -110,7 +216,7 @@ class Buttons extends React.Component{
             }
         }
 
-        if (counter==3 && new_this.state.disabled[2]==false){
+        if (counter==3 && new_this.state.disabled[2]==false || counter==3 && new_this.state.disabled[3]==false){
             bool_val=false;
             
         }
@@ -129,8 +235,8 @@ class Buttons extends React.Component{
     }
     else{
         render_sub_buttons=<div>
-        <button onClick={this.DrawInput}>Input with draw </button>
-        <button onClick={this.AddressInput}>Input with address </button>
+        <button onClick={this.DrawInput} disabled={this.state.disabled_2[0]}>Input with draw </button>
+        <button onClick={this.AddressInput} disabled={this.state.disabled_2[1]}>Input with address </button>
         </div>
     }
     console.log("button is ",buttons_for_poi)
@@ -144,7 +250,7 @@ class Buttons extends React.Component{
     
     <div>
         {render_sub_buttons}
-        <Form input={this.state.poi_option} coords={this.props.coords} input_handle={this.props.input_handle}  change_map_func={this.props.func_handle} address_change={this.props.change_address} poi_value={this.props.poi_val}/>
+        <Form reset_button_1={this.props.reset_button} reset_func_1={this.props.reset_func} trigger_func_1={this.Back_to_State} change_poi={this.Change_Input_Poi} change_poi_bool={this.props.change_poi_bool} change_arr={this.Change_Array_} button_={this.state.enabled_button} input={this.state.poi_option} coords={this.props.coords} input_handle={this.props.input_handle}  change_map_func={this.props.func_handle} address_change={this.props.change_address} poi_value={this.props.poi_val}/>
     </div>
     </div> 
     

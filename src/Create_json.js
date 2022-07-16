@@ -7,7 +7,7 @@ function return_json(desc,obj_){
            var z = x.map(y => {return {longitude : y[0] , latitude : y[1]}
            })
         
-           return {polygon : z}
+           return {points : z}
         })
         json=json[0]
     }
@@ -17,12 +17,24 @@ function return_json(desc,obj_){
             latitude : obj_[1]
         }}
     }
-    else if (desc="Point of interest"){
+    else if (desc=="Point of interest"){
         json= {point : {
             longitude : obj_[0][0],
             latitude : obj_[0][1]
             },
-            type_of_place : obj_[1]
+            point_of_interest : obj_[1]
+            }
+    }
+    else if (desc=="Home"){
+        json= {
+            longitude : obj_[0][0],
+            latitude : obj_[0][1],
+            floor: obj_[1],
+            levels: obj_[2],
+            year: obj_[3],
+            squareMeters: obj_[4],
+            buildingFees: obj_[5],
+            description: obj_[6]
             }
     }
 
